@@ -120,8 +120,11 @@
         return prefix ? prefix + id : id;
     }
     //end ide segundario
+    let tipoCambio = 6.96;
+    let mostrarTipocambio = false;
     let compra = {
         pesobruto: "",
+        ref: "",
         ley: "",
         // pesofino: "",
         //  onza: "",
@@ -183,6 +186,12 @@
 
     const addCompra = () => {
         //validar formulario
+
+        if (compra.estado) {
+        } else {
+            compra.anticipo = 100;
+        }
+
         if (compra.pesobruto == "") {
             Toast.fire({
                 icon: "error",
@@ -233,12 +242,20 @@
             return;
         }
 
+        // if (compras.length > 0) {
+        //     Toast.fire({
+        //         icon: "error",
+        //         title: "ya tiene una compra pendiente",
+        //     });
+        //     return;
+        // }
         compra.iddos = uniqueId("dos");
-        console.log(compra);
+        //  console.log(compra);
         compras = [...compras, compra];
         //limpiar campos
         compra = {
             pesobruto: "",
+            ref: "",
             ley: "",
             // pesofino: "",
             //  onza: "",
@@ -313,11 +330,13 @@
         console.log(iddos);
         console.log(cotizacion);
 
+        let anticipomod = 100;
+
         let onzadosmod = (
             (cotizacion *
                 (compra.ley / 100) *
                 (1 - compra.descuento / 100) *
-                (compra.anticipo / 100)) /
+                (anticipomod / 100)) /
             compra.variable
         ).toFixed(3);
 
@@ -325,7 +344,7 @@
             (cotizacion *
                 (compra.ley / 100) *
                 (1 - compra.descuento / 100) *
-                (compra.anticipo / 100)) /
+                (anticipomod / 100)) /
                 compra.variable
         );
 
@@ -335,6 +354,7 @@
             if (p.iddos == iddos) {
                 return {
                     ...p,
+                    anticipo: anticipomod,
                     estado: estadodos,
                     cotizacion: cotizacion,
                     onzados: onzadosmod,
@@ -367,8 +387,9 @@
         const numfac = await firebaseNumeroFac();
 
         let recibo = {
+            tipoCambio: tipoCambio,
             numerorecibo: numfac.length + 1,
-            motoTotal: total(compras),
+            montoTotal: total(compras),
             anticipo: anticipar == "" ? 0 : anticipar,
             saldo: total(compras) - anticipar,
             totalOnza: parseFloat(totalonza(compras)),
@@ -383,6 +404,8 @@
             nombre_us: userdos.nombre,
             estado: true, // estado de venta y compra
             estadonuevo: compras[0].estado, //cerrado abierto
+            //revisar todo esto
+            idCompra: compras[0].iddos, //ide de la compra del producto 1
         };
 
         try {
@@ -391,6 +414,9 @@
             //guardar compras con el id del recibo
             compras.map(async (r) => {
                 r.idrecibo = docRef.id;
+                r.idcliente = idcliente;
+                r.tipoCambio = tipoCambio;
+                r.estadonuevo = true;
                 try {
                     await addDoc(collection(db, "compras"), r);
                     console.log("agregado");
@@ -420,6 +446,13 @@
         });
 
         console.log(recibo);
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Guardado con exito",
+            showConfirmButton: false,
+            timer: 1500,
+        });
     };
 
     function myRound(num, dec) {
@@ -451,7 +484,7 @@
         });
         clientes = data;
 
-        console.log(clientes);
+        //console.log(clientes);
     };
     onMount(async () => {
         await loadClientes();
@@ -515,7 +548,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="row">
-                            <div class="mb-3 col-md-3">
+                            <div class="mb-3 col-md-2">
                                 <label class="form-label"><b>Estado</b> </label>
                                 <div class="mb-3 mb-0">
                                     <label class="radio-inline me-3"
@@ -536,7 +569,7 @@
                                     >
                                 </div>
                             </div>
-                            <div class="mb-3 col-md-3">
+                            <div class="mb-3 col-md-2">
                                 <label class="form-label"><b>Fecha</b></label>
                                 <input
                                     type="date"
@@ -545,7 +578,31 @@
                                     bind:value={compra.fecha}
                                 />
                             </div>
-                            <div class="mb-3 col-md-3">
+                            <div class="mb-3 col-md-2">
+                                <label class="form-label"
+                                    ><b>Tipo cambio</b></label
+                                >
+                                <input
+                                    type="number"
+                                    step="any"
+                                    class="form-control"
+                                    placeholder="0.00"
+                                    bind:value={tipoCambio}
+                                />
+                            </div>
+                            <div class="mb-3 col-md-2">
+                                <label class="form-label"
+                                    ><b>Dato Ref.</b></label
+                                >
+                                <input
+                                    type="number"
+                                    step="any"
+                                    class="form-control"
+                                    placeholder="0.00"
+                                    bind:value={compra.ref}
+                                />
+                            </div>
+                            <div class="mb-3 col-md-2">
                                 <label class="form-label"
                                     ><b>Peso bruto</b></label
                                 >
@@ -557,7 +614,7 @@
                                     bind:value={compra.pesobruto}
                                 />
                             </div>
-                            <div class="mb-3 col-md-3">
+                            <div class="mb-3 col-md-2">
                                 <label><b>Ley</b></label>
                                 <input
                                     type="number"
@@ -567,6 +624,7 @@
                                     bind:value={compra.ley}
                                 />
                             </div>
+
                             <div class="mb-3 col-md-3">
                                 <label><b>Cotizacion</b></label>
                                 <input
@@ -633,7 +691,7 @@
                                         <th>Cotizacion</th>
                                         <th>ONZA</th>
                                         <th>P. UNIT</th>
-                                        <th>Costo</th>
+                                        <th>Costo ($)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -646,7 +704,7 @@
                                                     class="d-flex align-items-center"
                                                 >
                                                     <i
-                                                        class="fa fa-circle text-success me-1"
+                                                        class="fa fa-circle text-danger me-1"
                                                         aria-hidden="true"
                                                     /> Abierto
                                                 </div>
@@ -655,7 +713,7 @@
                                                     class="d-flex align-items-center"
                                                 >
                                                     <i
-                                                        class="fa fa-circle text-danger me-1"
+                                                        class="fa fa-circle text-success me-1"
                                                         aria-hidden="true"
                                                     /> Cerrado
                                                 </div>
@@ -695,31 +753,6 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="card mt-3">
-                    <!-- <div class="card-header">
-                        <div>
-                            <button
-                                type="button"
-                                class="btn btn-primary btn-sm"
-                                on:click={guardar}>Guardar</button
-                            >
-
-                            
-                            <button
-                                type="button"
-                                class="btn btn-success mb-2 btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModalCenter"
-                                >Anticipo</button
-                            >
-                        </div>
-                        <strong
-                            >{moment(new Date()).format("yyyy-MM-DD")}</strong
-                        >
-
-                        <span class="float-end">
-                            <strong>Status:</strong> Pending</span
-                        >
-                    </div> -->
                     <div class="card-body">
                         <div class="row mb-5">
                             <div
@@ -789,7 +822,10 @@
                                         <th>Cotizacion</th>
                                         <th>ONZA</th>
                                         <th>P. UNIT</th>
-                                        <th>Costo</th>
+                                        <th>Costo ($)</th>
+                                        {#if mostrarTipocambio}
+                                            <th>Costo (Bs)</th>
+                                        {/if}
                                         <th />
                                     </tr>
                                 </thead>
@@ -804,7 +840,7 @@
                                                         class="d-flex align-items-center"
                                                     >
                                                         <i
-                                                            class="fa fa-circle text-success me-1"
+                                                            class="fa fa-circle text-danger me-1"
                                                             aria-hidden="true"
                                                         /> Abierto
                                                     </div>
@@ -813,7 +849,7 @@
                                                         class="d-flex align-items-center"
                                                     >
                                                         <i
-                                                            class="fa fa-circle text-danger me-1"
+                                                            class="fa fa-circle text-success me-1"
                                                             aria-hidden="true"
                                                         /> Cerrado
                                                     </div>
@@ -835,6 +871,11 @@
                                             <td>{r.preciounitario}</td>
                                             <td class="table-info">{r.costo}</td
                                             >
+                                            {#if mostrarTipocambio}
+                                                <td class="table-info"
+                                                    >{r.costo * tipoCambio}</td
+                                                >
+                                            {/if}
                                             <td>
                                                 <div class="d-flex">
                                                     {#if r.estado}
@@ -888,13 +929,69 @@
                                         <td />
                                         <td />
                                         <td>{total(compras).toFixed(2)}</td>
+
+                                        {#if mostrarTipocambio}
+                                            <td
+                                                >{(
+                                                    total(compras) * tipoCambio
+                                                ).toFixed(2)}</td
+                                            >
+                                        {/if}
                                         <td />
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="row">
-                            <div class="col-lg-4 col-sm-5" />
+                            {#if mostrarTipocambio}
+                                <div class="col-2" />
+                                <div class="col-lg-4 col-sm-5">
+                                    <table class="table table-clear">
+                                        <tbody>
+                                            <tr>
+                                                <td class="left"
+                                                    ><strong>Monto Total</strong
+                                                    ></td
+                                                >
+                                                <td class="right"
+                                                    >Bs. {(
+                                                        total(compras) *
+                                                        tipoCambio
+                                                    ).toFixed(2)}</td
+                                                >
+                                            </tr>
+                                            <tr>
+                                                <td class="left"
+                                                    ><strong>Anticipo</strong
+                                                    ></td
+                                                >
+                                                <td class="right"
+                                                    >Bs. {anticipar *
+                                                        tipoCambio}</td
+                                                >
+                                            </tr>
+
+                                            <tr>
+                                                <td class="left"
+                                                    ><strong>Saldo</strong></td
+                                                >
+                                                <td class="right"
+                                                    ><strong
+                                                        >Bs. {(total(
+                                                            compras
+                                                        ).toFixed(2) -
+                                                            anticipar) *
+                                                            tipoCambio}</strong
+                                                    ><br />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {:else}
+                                <div class="col-lg-4 col-sm-5" />
+                            {/if}
+
                             <div class="col-lg-4 col-sm-5 ms-auto">
                                 <table class="table table-clear">
                                     <tbody>
@@ -954,6 +1051,7 @@
                                     class="  form-control input-rounded mb-3"
                                     on:change={() => seleccionarCliente()}
                                 >
+                                    <option value="">Seleccionar</option>
                                     {#each clientes as r}
                                         <option value={r.id}>{r.nombre}</option>
                                     {:else}
@@ -964,9 +1062,22 @@
                                 </select>
                             </div>
                         </div>
-                        <strong
-                            >{moment(new Date()).format("yyyy-MM-DD")}</strong
-                        >
+                        <div class="col-xl-4 col-xxl-6 col-6">
+                            <div
+                                class="form-check custom-checkbox mb-3 checkbox-info"
+                            >
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    bind:checked={mostrarTipocambio}
+                                />
+                                <label
+                                    class="form-check-label"
+                                    for="customCheckBox2"
+                                    >Mostrar en Bolivianos</label
+                                >
+                            </div>
+                        </div>
 
                         <div>
                             <button

@@ -1568,6 +1568,12 @@
                         <span class="nav-text">Reportes</span>
                     </a>
                 </li>
+                <li>
+                    <a href="/recibodos" class="" aria-expanded="false">
+                        <i class="fi fi-rr-chart-histogram" />
+                        <span class="nav-text">Cerrar</span>
+                    </a>
+                </li>
             {/if}
             {#if userdos.rol == "Administrador" || userdos.rol == "Invitado"}
                 <li>

@@ -17,7 +17,7 @@
 
     onMount(() => {
         if (localStorage.getItem("io")) {
-            console.log("entro Home");
+            // console.log("entro Home");
         } else {
             console.log("no entro Home");
             navigate("/login", { replace: true });
@@ -156,7 +156,7 @@
         let total = 0;
         data.map((r) => {
             if (!r.estado) {
-                total = total + r.motoTotal;
+                total = total + r.montoTotal;
             }
         });
         return total;
@@ -283,7 +283,7 @@
                             <tr>
                                 <th>Fecha</th>
                                 <th>Nombre completo</th>
-                                <th>C.I.</th>
+
                                 <th>Tipo</th>
                                 <th>Recibo</th>
 
@@ -302,7 +302,7 @@
                                 <tr>
                                     <th>{r.fecha}</th>
                                     <td>{r.nombre_cli}</td>
-                                    <td>{r.ci_cli}</td>
+
                                     <td>
                                         {#if r.estado}
                                             <span class="badge badge-primary"
@@ -326,7 +326,7 @@
                                     <td>{r.totalOnza}</td>
                                     <td>{r.saldo}</td>
                                     <td>{r.anticipo}</td>
-                                    <td>{r.motoTotal}</td>
+                                    <td>{r.montoTotal}</td>
 
                                     <td class="color-primary">
                                         <button

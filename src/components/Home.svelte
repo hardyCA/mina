@@ -13,7 +13,7 @@
             let data = JSON.parse(localStorage.getItem("usuario"));
             userdos = data;
         } else {
-            console.log("No autenticado");
+            // console.log("No autenticado");
         }
     }
     $: ver();
@@ -22,7 +22,7 @@
         if (localStorage.getItem("io")) {
             console.log("entro Home");
         } else {
-            console.log("no entro Home");
+            // console.log("no entro Home");
             navigate("/login", { replace: true });
         }
     });

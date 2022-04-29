@@ -33,9 +33,9 @@
 
     onMount(() => {
         if (localStorage.getItem("io")) {
-            console.log("entro Home");
+            // console.log("entro Home");
         } else {
-            console.log("no entro Home");
+            // console.log("no entro Home");
             navigate("/login", { replace: true });
         }
         if (userdoss.rol != "Administrador") {
@@ -77,7 +77,7 @@
         });
         clientes = data;
         carga = true;
-        console.log(clientes);
+        //  console.log(clientes);
     };
     onMount(async () => {
         await loadClientes();
@@ -111,7 +111,7 @@
         //     return;
         // }
         let encontrado = await buscarCi(cliente.ci);
-        console.log(encontrado);
+        // console.log(encontrado);
         // if (encontrado.length != 0) {
         //     Toast.fire({
         //         icon: "error",

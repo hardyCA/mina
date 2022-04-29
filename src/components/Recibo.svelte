@@ -36,9 +36,9 @@
 
     onMount(() => {
         if (localStorage.getItem("io")) {
-            console.log("entro Home");
+            // console.log("entro Home");
         } else {
-            console.log("no entro Home");
+            // console.log("no entro Home");
             navigate("/login", { replace: true });
         }
         if (userdoss.rol == "Asistente") {
@@ -103,16 +103,19 @@
     let iddos = "";
     let dataAnticipo = "";
     $: dataAnticipo = recibos.anticipo;
-
+    let mostrarTipocambio = false;
     const modificarcompra = async () => {
-        console.log(iddos);
-        console.log(cotizacion);
+        // console.log(iddos);
+        //  console.log(cotizacion);
         recibos.estadonuevo = false;
+
+        let anticipomod = 100;
+
         let onzadosmod = (
             (cotizacion *
                 (compra.ley / 100) *
                 (1 - compra.descuento / 100) *
-                (compra.anticipo / 100)) /
+                (anticipomod / 100)) /
             compra.variable
         ).toFixed(3);
 
@@ -120,7 +123,7 @@
             (cotizacion *
                 (compra.ley / 100) *
                 (1 - compra.descuento / 100) *
-                (compra.anticipo / 100)) /
+                (anticipomod / 100)) /
                 compra.variable
         );
 
@@ -136,6 +139,7 @@
         //**compra*/
         const washingtonRefdos = doc(db, "compras", compra.id);
         await updateDoc(washingtonRefdos, {
+            anticipo: anticipomod,
             estado: estadodos,
             cotizacion: cotizacion,
             onzados: onzadosmod,
@@ -148,6 +152,7 @@
             if (p.iddos == iddos) {
                 return {
                     ...p,
+                    anticipo: anticipomod,
                     estado: estadodos,
                     cotizacion: cotizacion,
                     onzados: onzadosmod,
@@ -190,7 +195,7 @@
             )}.pdf`,
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: {
-                scale: 2,
+                scale: 5,
                 logging: true,
                 dpi: 192,
                 letterRendering: true,
@@ -204,6 +209,8 @@
         //  html2pdf(element, opt);
         // window.open("data:application/pdf," + encodeURI(pdfString));
     };
+
+    //capturar div jpg
 </script>
 
 <!-- <div class="row page-titles">
@@ -216,10 +223,11 @@
         </li>
     </ol>
 </div> -->
-<div class="row">
+<!-- <div class="row">
     <Oro />
     <Onza />
-</div>
+</div> -->
+
 <div class="row">
     <div class="col-xl-12 col-lg-12">
         <div class="row">
@@ -253,7 +261,23 @@
                                 >Anticipo</button
                             >
                         </div>
-                        <strong>{recibos.fecha}</strong>
+
+                        <div class="col-xl-4 col-xxl-6 col-6">
+                            <div
+                                class="form-check custom-checkbox mb-3 checkbox-info"
+                            >
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    bind:checked={mostrarTipocambio}
+                                />
+                                <label
+                                    class="form-check-label"
+                                    for="customCheckBox2"
+                                    >Mostrar en Bolivianos</label
+                                >
+                            </div>
+                        </div>
 
                         <span class="float-end">
                             {#if recibos.estadonuevo}
@@ -273,7 +297,7 @@
                             {/if}
                         </span>
                     </div>
-                    <div id="areaImprimir">
+                    <div id="areaImprimir" class="myDivToPrint">
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div
@@ -330,21 +354,85 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive">
+                            <div class="table-responsive tabla-xxzoom">
                                 <table class="table  table-bordered ">
-                                    <thead class="thead-info">
+                                    <!-- <thead>
                                         <tr>
-                                            <th scope="col">Fecha</th>
-                                            <th scope="col">---------</th>
-                                            <th scope="col">Peso bruto</th>
-                                            <th scope="col">Ley</th>
-                                            <th scope="col">Peso fino</th>
-                                            <th scope="col">ONZA</th>
-                                            <th scope="col">Cotizacion</th>
-                                            <th scope="col">ONZA</th>
-                                            <th scope="col">P. UNIT</th>
-                                            <th scope="col">Costo</th>
-                                            <th scope="col" />
+                                            {#each compras as r}
+                                                <td class="table-dark"
+                                                    >Anticipo: <br />
+                                                    {r.anticipo}
+                                                    %</td
+                                                >
+                                                <td class="table-warning"
+                                                    >descuento: <br />
+                                                    {r.descuento}
+                                                    %</td
+                                                >
+                                            {/each}
+                                        </tr>
+                                    </thead>. -->
+                                    <thead class="thead-info  ">
+                                        <tr>
+                                            <th scope="col"
+                                                ><small> Fecha </small></th
+                                            >
+                                            <!-- <th scope="col"  id>---------</th> -->
+                                            {#if mostrarTipocambio}
+                                                <th scope="col"
+                                                    ><small>
+                                                        Peso <br /> Bruto
+                                                    </small></th
+                                                >
+                                            {/if}
+                                            <th scope="col" id>
+                                                {#if mostrarTipocambio}
+                                                    <small>
+                                                        Peso <br /> Fundido
+                                                    </small>
+                                                {:else}
+                                                    <small>
+                                                        Peso <br /> Bruto
+                                                    </small>
+                                                {/if}
+                                            </th>
+                                            <th scope="col"
+                                                ><small> Ley </small></th
+                                            >
+                                            <th scope="col"
+                                                ><small>
+                                                    Peso <br /> fino
+                                                </small></th
+                                            >
+                                            <th scope="col"
+                                                ><small> ONZA </small></th
+                                            >
+                                            <th scope="col"
+                                                ><small> Cotizacion </small></th
+                                            >
+                                            <th scope="col"
+                                                ><small> ONZA </small></th
+                                            >
+                                            <th scope="col"
+                                                ><small> P. UNIT($) </small></th
+                                            >
+                                            {#if mostrarTipocambio}
+                                                <th scope="col"
+                                                    ><small>
+                                                        P. UNIT(Bs.)
+                                                    </small></th
+                                                >
+                                            {/if}
+                                            <th scope="col"
+                                                ><small> Costo ($) </small></th
+                                            >
+                                            {#if mostrarTipocambio}
+                                                <th scope="col"
+                                                    ><small>
+                                                        Costo (Bs)
+                                                    </small></th
+                                                >
+                                            {/if}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -358,7 +446,7 @@
                                                             class="d-flex align-items-center"
                                                         >
                                                             <i
-                                                                class="fa fa-circle text-success me-1"
+                                                                class="fa fa-circle text-danger me-1"
                                                                 aria-hidden="true"
                                                             /> Abierto
                                                         </div>
@@ -367,34 +455,61 @@
                                                             class="d-flex align-items-center"
                                                         >
                                                             <i
-                                                                class="fa fa-circle text-danger me-1"
+                                                                class="fa fa-circle text-success me-1"
                                                                 aria-hidden="true"
                                                             /> Cerrado
                                                         </div>
                                                     {/if}
+                                                    Anticipo:
+                                                    {r.anticipo}
+                                                    %<br />
+                                                    descuento:
+                                                    {r.descuento}
+                                                    %
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     Anticipo: {r.anticipo}
                                                     %
                                                     <br />
                                                     descuento: {r.descuento}
                                                     %
-                                                </td>
+                                                </td> -->
+                                                {#if mostrarTipocambio}
+                                                    <td>{r.ref}</td>
+                                                {/if}
                                                 <td>{r.pesobruto}</td>
                                                 <td>{r.ley} %</td>
                                                 <td>{r.pesofino}</td>
-                                                <td class="table-info"
-                                                    >{r.onza}</td
+                                                <td class="table-info">
+                                                    {r.onza}</td
                                                 >
                                                 <td>{r.cotizacion}</td>
                                                 <td>{r.onzados}</td>
                                                 <td>{r.preciounitario}</td>
+                                                {#if mostrarTipocambio}
+                                                    <td
+                                                        >{(
+                                                            r.preciounitario *
+                                                            recibos.tipoCambio
+                                                        ).toFixed(2)}</td
+                                                    >
+                                                {/if}
+
                                                 <td class="table-info"
                                                     >{r.costo}</td
                                                 >
-                                                <td>
-                                                    <div class="d-flex">
-                                                        {#if r.estado}
+                                                {#if mostrarTipocambio}
+                                                    <td class="table-info"
+                                                        >{(
+                                                            r.costo *
+                                                            recibos.tipoCambio
+                                                        ).toFixed(2)}</td
+                                                    >
+                                                {/if}
+
+                                                {#if r.estado}
+                                                    <td>
+                                                        <div class="d-flex">
                                                             <button
                                                                 on:click={() => {
                                                                     iddos =
@@ -409,34 +524,24 @@
                                                                     aria-hidden="true"
                                                                 /></button
                                                             >
-                                                        {:else}{/if}
-
-                                                        <!-- <button
-                                                        on:click={() => {
-                                                            eliminarcompra(
-                                                                r.iddos
-                                                            );
-                                                        }}
-                                                        class="btn btn-danger shadow btn-xs sharp"
-                                                        ><i
-                                                            class="fa fa-trash"
-                                                            aria-hidden="true"
-                                                        /></button
-                                                    > -->
-                                                    </div>
-                                                </td>
+                                                        </div>
+                                                    </td>
+                                                {/if}
                                             </tr>
                                         {/each}
 
                                         <tr class="table-dark">
                                             <td>Total</td>
-                                            <td />
+                                            {#if mostrarTipocambio}
+                                                <td />
+                                            {/if}
                                             <td
                                                 >{totalpesobruto(
                                                     compras
                                                 ).toFixed(2)}</td
                                             >
                                             <td />
+
                                             <td
                                                 >{totalpesofino(
                                                     compras
@@ -449,19 +554,83 @@
                                             >
                                             <td />
                                             <td />
+                                            {#if mostrarTipocambio}
+                                                <td />
+                                            {/if}
                                             <td />
                                             <td>{total(compras).toFixed(2)}</td>
-                                            <td />
+                                            {#if mostrarTipocambio}
+                                                <td
+                                                    >{(
+                                                        total(compras) *
+                                                        recibos.tipoCambio
+                                                    ).toFixed(2)}</td
+                                                >
+                                            {/if}
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
                             <div class="row">
-                                <div class="col-lg-4 col-sm-5" />
+                                {#if mostrarTipocambio}
+                                    <div class="col-2" />
+                                    <div class="col-lg-4 col-sm-5 ms-auto">
+                                        <table
+                                            class="table table-bordered  table table-clear"
+                                        >
+                                            <tbody>
+                                                <tr>
+                                                    <td class="left"
+                                                        ><strong
+                                                            >Monto Total</strong
+                                                        ></td
+                                                    >
+                                                    <td class="right"
+                                                        >Bs. {(
+                                                            total(compras) *
+                                                            recibos.tipoCambio
+                                                        ).toFixed(2)}</td
+                                                    >
+                                                </tr>
+                                                <tr>
+                                                    <td class="left"
+                                                        ><strong
+                                                            >Anticipo</strong
+                                                        ></td
+                                                    >
+                                                    <td class="right"
+                                                        >Bs. {dataAnticipo *
+                                                            recibos.tipoCambio}</td
+                                                    >
+                                                </tr>
+
+                                                <tr>
+                                                    <td class="left"
+                                                        ><strong>Saldo</strong
+                                                        ></td
+                                                    >
+                                                    <td class="right"
+                                                        ><strong
+                                                            >$ {(total(
+                                                                compras
+                                                            ).toFixed(2) -
+                                                                dataAnticipo) *
+                                                                recibos.tipoCambio}</strong
+                                                        ><br />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <br />
+                                    </div>
+                                {:else}
+                                    <div class="col-lg-4 col-sm-5" />
+                                {/if}
+
                                 <div class="col-lg-4 col-sm-5 ms-auto">
                                     <table
-                                        class="table table-bordered  primary-table-bg-hover"
+                                        class="table table-bordered  table table-clear"
                                     >
                                         <tbody>
                                             <tr>
@@ -607,6 +776,12 @@
 <style>
     #areaImprimir {
         page-break-inside: avoid;
-        padding-right: 0px;
+        transform: scale(0.8);
+        transform-origin: 0 0;
+        margin: 0 -25% 0 0;
+        padding-right: 10px;
+    }
+    #table-zoomhead {
+        zoom: 80%;
     }
 </style>

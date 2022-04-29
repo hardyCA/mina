@@ -36,9 +36,9 @@
 
     onMount(() => {
         if (localStorage.getItem("io")) {
-            console.log("entro Home");
+            // console.log("entro Home");
         } else {
-            console.log("no entro Home");
+            //console.log("no entro Home");
             navigate("/login", { replace: true });
         }
         if (userdoss.rol == "Invitado") {
@@ -78,7 +78,7 @@
                     ...doc.data(),
                 });
             });
-            console.log("DENTRO suscribete", productos);
+            // console.log("DENTRO suscribete", productos);
             montoSaldo = productos[0].monto;
         });
     };
@@ -134,7 +134,7 @@
                 const docRef = await addDoc(collection(db, "caja"), caja);
                 caja.id = docRef.id;
                 movimientos = [...movimientos, caja];
-                console.log("Document written with ID: ", docRef.id);
+                //  console.log("Document written with ID: ", docRef.id);
                 //mensaje de registro de cliente
                 //*end mensaje de registro*//
 
@@ -199,6 +199,31 @@
         });
         return total;
     };
+
+    //pdf
+    const pdfprin = () => {
+        console.log("entro");
+        var element = document.getElementById("areaImprimir");
+        var opt = {
+            pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+            margin: 0.5,
+            filename: `reporte.pdf`,
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                logging: true,
+                dpi: 192,
+                letterRendering: true,
+            },
+            jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
+        };
+        // New Promise-based usage:
+        html2pdf().set(opt).from(element).save();
+
+        // Old monolithic-style usage:
+        //  html2pdf(element, opt);
+        // window.open("data:application/pdf," + encodeURI(pdfString));
+    };
 </script>
 
 <div class="row page-titles">
@@ -227,6 +252,14 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="col-3">
+        <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            on:click={() => pdfprin()}
+            >PDF <i class="fa fa-file-pdf-o" aria-hidden="true" /></button
+        >
     </div>
 </div>
 <div class="row">
@@ -300,6 +333,7 @@
             </div>
         </div>
     </div>
+
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
@@ -324,7 +358,7 @@
                     />
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" id="areaImprimir">
                 <div class="table-responsive">
                     <table class="table table-bordered table-responsive-sm">
                         <thead>
@@ -371,3 +405,13 @@
         </div>
     </div>
 </div>
+
+<style>
+    #areaImprimir {
+        page-break-inside: avoid;
+        transform: scale(0.8);
+        transform-origin: 0 0;
+        margin: 0 -25% 0 0;
+        padding-right: 10px;
+    }
+</style>

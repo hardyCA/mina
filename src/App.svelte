@@ -22,6 +22,7 @@
 	import Reportecompra from "./components/Reportecompra.svelte";
 	import Reporteventa from "./components/Reporteventa.svelte";
 	import Totalcompra from "./components/Totalcompra.svelte";
+	import Recibodos from "./components/Recibodos.svelte";
 
 	$: onMount(() => {
 		if (localStorage.getItem("io")) {
@@ -35,7 +36,7 @@
 			let data = JSON.parse(localStorage.getItem("io"));
 			user.setUser(data);
 		} else {
-			console.log("No autenticado");
+			//console.log("No autenticado");
 		}
 	}
 	$: ver();
@@ -64,6 +65,7 @@ Content body start
 				<Route path="/recibo"><Recibo /></Route>
 				<Route path="/reporte-compra"><Reportecompra /></Route>
 				<Route path="/reporte-venta"><Reporteventa /></Route>
+				<Route path="/recibodos"><Recibodos /></Route>
 			</Router>
 		</div>
 	</div>

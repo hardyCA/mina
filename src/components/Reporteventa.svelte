@@ -107,6 +107,15 @@
         });
         return total;
     };
+    const totalSaldoBS = (data) => {
+        let total = 0;
+        data.map((r) => {
+            if (r.estadonuevo) {
+                total = total + r.saldo * r.tipoCambio;
+            }
+        });
+        return total;
+    };
     const totalAnticipo = (data) => {
         let total = 0;
         data.map((r) => {
@@ -116,11 +125,29 @@
         });
         return total;
     };
+    const totalAnticipoBS = (data) => {
+        let total = 0;
+        data.map((r) => {
+            if (r.estadonuevo) {
+                total = total + r.anticipo * r.tipoCambio;
+            }
+        });
+        return total;
+    };
     const totalTotal = (data) => {
         let total = 0;
         data.map((r) => {
             if (r.estadonuevo) {
                 total = total + r.motoTotal;
+            }
+        });
+        return total;
+    };
+    const totalTotalBS = (data) => {
+        let total = 0;
+        data.map((r) => {
+            if (r.estadonuevo) {
+                total = total + r.motoTotal * r.tipoCambio;
             }
         });
         return total;
@@ -162,11 +189,29 @@
         });
         return total;
     };
+    const totalSaldodosBS = (data) => {
+        let total = 0;
+        data.map((r) => {
+            if (!r.estadonuevo) {
+                total = total + r.saldo * r.tipoCambio;
+            }
+        });
+        return total;
+    };
     const totalAnticipodos = (data) => {
         let total = 0;
         data.map((r) => {
             if (!r.estadonuevo) {
                 total = total + r.anticipo;
+            }
+        });
+        return total;
+    };
+    const totalAnticipodosBS = (data) => {
+        let total = 0;
+        data.map((r) => {
+            if (!r.estadonuevo) {
+                total = total + r.anticipo * r.tipoCambio;
             }
         });
         return total;
@@ -177,6 +222,79 @@
             if (!r.estadonuevo) {
                 total = total + r.motoTotal;
             }
+        });
+        return total;
+    };
+    const totalTotaldosBS = (data) => {
+        let total = 0;
+        data.map((r) => {
+            if (!r.estadonuevo) {
+                total = total + r.motoTotal * r.tipoCambio;
+            }
+        });
+        return total;
+    };
+    // TOTAK TOTAL
+    const totalPBdosTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.totalpesoBruto;
+        });
+        return total;
+    };
+    const totalPFdosTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.totalPesofino;
+        });
+        return total;
+    };
+    const totalONZAdosTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.totalOnza;
+        });
+        return total;
+    };
+    const totalSaldodosTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.saldo;
+        });
+        return total;
+    };
+    const totalSaldodosBSTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.saldo * r.tipoCambio;
+        });
+        return total;
+    };
+    const totalAnticipodosTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.anticipo;
+        });
+        return total;
+    };
+    const totalAnticipodosBSTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.anticipo * r.tipoCambio;
+        });
+        return total;
+    };
+    const totalTotaldosTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.montoTotal;
+        });
+        return total;
+    };
+    const totalTotaldosBSTT = (data) => {
+        let total = 0;
+        data.map((r) => {
+            total = total + r.montoTotal * r.tipoCambio;
         });
         return total;
     };
@@ -357,7 +475,7 @@
                         /></button
                     >
                 </div>
-                <h4 class="card-title">REPORTE DE COMPRAS</h4>
+                <h4 class="card-title">REPORTE DE VENTA</h4>
                 <h4>activo</h4>
             </div>
             <div class="card-body" id="areaImprimir">
@@ -369,17 +487,20 @@
                         <thead class="thead-info">
                             <tr>
                                 <th>Fecha</th>
-                                <th>Nombre completo</th>
+                                <th>Nombre </th>
 
-                                <th>Operacion</th>
+                                <!-- <th>Operacion</th> -->
                                 <th>Recibo</th>
 
                                 <th>T.P.B</th>
                                 <th>T.P.F</th>
                                 <th> ONZA</th>
-                                <th>Saldo</th>
-                                <th>Anticipo</th>
-                                <th>TOTAL</th>
+                                <th>Saldo ($)</th>
+                                <th>Saldo (Bs.)</th>
+                                <th>Anticipo ($)</th>
+                                <th>Anticipo (Bs.)</th>
+                                <th>TOTAL ($)</th>
+                                <th>TOTAL (Bs.)</th>
 
                                 <th />
                             </tr>
@@ -390,7 +511,7 @@
                                     <th>{r.fecha}</th>
                                     <td>{r.nombre_cli}</td>
 
-                                    <td>
+                                    <!-- <td>
                                         {#if r.estadonuevo}
                                             <span class="badge badge-danger"
                                                 >abierto</span
@@ -400,7 +521,7 @@
                                                 >cerrado</span
                                             >
                                         {/if}
-                                    </td>
+                                    </td> -->
                                     <td class="color-primary"
                                         >{String(r.numerorecibo).padStart(
                                             6,
@@ -412,9 +533,13 @@
                                     <td>{r.totalPesofino}</td>
                                     <td>{r.totalOnza}</td>
                                     <td>{r.saldo}</td>
+                                    <td>{r.saldo * r.tipoCambio}</td>
                                     <td>{r.anticipo}</td>
-                                    <td class="table-info">{r.motoTotal}</td>
-
+                                    <td>{r.anticipo * r.tipoCambio}</td>
+                                    <td class="table-info">{r.montoTotal}</td>
+                                    <td class="table-info"
+                                        >{r.montoTotal * r.tipoCambio}</td
+                                    >
                                     <td class="color-primary">
                                         <button
                                             class="btn btn-sm btn-dark"
@@ -425,7 +550,7 @@
                                     </td>
                                 </tr>
                             {/each}
-                            <tr>
+                            <!-- <tr>
                                 <td>TOTAL Abierta</td>
                                 <td />
                                 <td />
@@ -437,13 +562,22 @@
                                     >{myRound(totalONZA(datos))}</td
                                 >
                                 <td class="table-danger"
-                                    >{myRound(totalSaldo(datos))}</td
+                                    >{myRound(totalSaldo(datos))}
+                                </td>
+                                <td class="table-danger"
+                                    >{myRound(totalSaldoBS(datos))}</td
                                 >
                                 <td class="table-danger"
-                                    >{myRound(totalAnticipo(datos))}</td
+                                    >{myRound(totalAnticipo(datos))}
+                                </td>
+                                <td class="table-danger"
+                                    >{myRound(totalAnticipoBS(datos))}</td
                                 >
                                 <td class="table-danger"
-                                    >{myRound(totalTotal(datos))}</td
+                                    >{myRound(totalTotal(datos))}
+                                </td>
+                                <td class="table-danger"
+                                    >{myRound(totalTotalBS(datos))}</td
                                 >
                                 <td />
                             </tr>
@@ -462,14 +596,54 @@
                                     >{myRound(totalSaldodos(datos))}</td
                                 >
                                 <td class="table-success"
+                                    >{myRound(totalSaldodosBS(datos))}
+                                </td>
+                                <td class="table-success"
                                     >{totalAnticipodos(datos)}</td
                                 >
                                 <td class="table-success"
+                                    >{totalAnticipodosBS(datos)}
+                                </td>
+                                <td class="table-success"
                                     >{myRound(totalTotaldos(datos))}</td
                                 >
+                                <td class="table-success"
+                                    >{myRound(totalTotaldosBS(datos))}
+                                </td>
+                                <td />
+                            </tr> -->
+
+                            <!-- total -->
+                            <tr>
+                                <td>TOTAL </td>
+                                <td />
+
+                                <td />
+                                <td />
+                                <td />
+                                <td class="table-dark"
+                                    >{myRound(totalONZAdosTT(datos))}</td
+                                >
+                                <td class="table-dark"
+                                    >{myRound(totalSaldodosTT(datos))}</td
+                                >
+                                <td class="table-dark"
+                                    >{myRound(totalSaldodosBSTT(datos))}
+                                </td>
+                                <td class="table-dark"
+                                    >{totalAnticipodosTT(datos)}</td
+                                >
+                                <td class="table-dark"
+                                    >{totalAnticipodosBSTT(datos)}
+                                </td>
+                                <td class="table-dark"
+                                    >{myRound(totalTotaldosTT(datos))}</td
+                                >
+                                <td class="table-dark"
+                                    >{myRound(totalTotaldosBSTT(datos))}
+                                </td>
                                 <td />
                             </tr>
-
                             <!-- <tr>
                             <th>12/04/2022</th>
                             <td>Kolor Tea Shirt For Man</td>
@@ -498,6 +672,9 @@
 <style>
     #areaImprimir {
         page-break-inside: avoid;
+        transform: scale(0.8);
+        transform-origin: 0 0;
+        margin: 0 -25% 0 0;
         padding-right: 10px;
     }
 </style>

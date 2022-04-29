@@ -35,3 +35,47 @@ export const buscarComprasFirebase = async (id) => {
     });
     return data;
 }
+
+export const buscarComprasFirebaseCliente = async (id, desde, asta, estadonuevo) => {
+    let data = [];
+    let q
+    if (estadonuevo === 1) {
+        q = query(
+            collection(db, "compras"),
+
+            where("idcliente", "==", id),
+            where("fecha", ">=", desde),
+            where("fecha", "<=", asta),
+            orderBy("fecha")
+        );
+    } else if (estadonuevo === true) {
+        q = query(
+            collection(db, "compras"),
+            where("estado", "==", true),
+            where("idcliente", "==", id),
+            where("fecha", ">=", desde),
+            where("fecha", "<=", asta),
+            orderBy("fecha")
+        );
+    } else {
+        q = query(
+            collection(db, "compras"),
+            where("estado", "==", false),
+            where("idcliente", "==", id),
+            where("fecha", ">=", desde),
+            where("fecha", "<=", asta),
+            orderBy("fecha")
+        );
+    }
+
+
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        data.push({
+            id: doc.id,
+            ...doc.data(),
+        });
+    });
+    return data;
+}

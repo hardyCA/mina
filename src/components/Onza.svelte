@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
     import {
         addDoc,
         collection,
@@ -109,4 +109,4 @@
             {/if}
         </div>
     </div>
-</div>
+</div> -->
